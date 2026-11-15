@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="viewport" id="viewportMeta" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="data:," />
     <title>Code 代码自习</title>
@@ -102,10 +102,14 @@
       .wchip.miss{ border-color:var(--line); background:var(--panel2); opacity:.7; }
       .match-status{ font-size:14px; color:var(--muted); margin-top:8px; }
       /* playground */
+      /* 代码框视觉字号保持 13.5px（--code-font-size），不靠改大字号防放大；
+         防放大靠 viewport 的 maximum-scale=1 + 下方脚本在聚焦时临时锁定缩放，
+         touch-action:manipulation 再去掉双击放大。 */
       textarea.play{
         width:100%; max-width:100%; min-height:120px; border-radius:12px; border:1px solid var(--line);
         background:var(--code-bg); color:var(--code-ink); padding:12px 14px;
         font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:var(--code-font-size); line-height:1.6; resize:none; overflow:hidden;
+        touch-action:manipulation; -webkit-text-size-adjust:100%; text-size-adjust:100%;
       }
       .btn.small{ min-height:38px; padding:7px 13px; font-size:14px; }
       .btn:disabled{ opacity:.45; cursor:default; }
@@ -371,6 +375,25 @@
     </div>
 
     <script>
+    /* 点代码框时整页自动放大，是手机浏览器对字号小于 16px 的输入框做的聚焦放大。
+       代码框视觉字号保持 13.5px 不变，这里从缩放这边拦：页面 viewport 已带
+       maximum-scale=1；聚焦到代码框（textarea）期间再临时加上 user-scalable=no
+       锁住缩放，离开输入框后恢复，平时捏合缩放不受影响。 */
+    (function(){
+      var meta = document.getElementById("viewportMeta");
+      if (!meta) return;
+      var base = "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover";
+      var locked = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover";
+      document.addEventListener("focusin", function(e){
+        if (e.target && e.target.tagName === "TEXTAREA") meta.setAttribute("content", locked);
+      });
+      document.addEventListener("focusout", function(){
+        setTimeout(function(){
+          if (!document.activeElement || document.activeElement.tagName !== "TEXTAREA") meta.setAttribute("content", base);
+        }, 50);
+      });
+      document.addEventListener("gesturestart", function(e){ e.preventDefault(); });
+    })();
     var WEEKS = ["第 1 周 · HTML","第 2 周 · CSS","第 3 周 · JS","第 4 周 · 综合项目"];
     var DAYS = [
     /* ---------- 第 1 周 HTML ---------- */
