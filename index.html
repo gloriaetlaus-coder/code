@@ -12,7 +12,7 @@
         --bg:#f3f5f3; --panel:#ffffff; --panel2:#eef1ee; --ink:#1d2620; --muted:#5c6a61;
         --accent:#177245; --accent-ink:#ffffff; --accent-soft:#e2f1e8;
         --amber:#b45309; --amber-soft:#fdf0dd;
-        --line:#d8ded9; --code-bg:#16211b; --code-ink:#e8f2ec;
+        --line:#d8ded9; --code-bg:#16211b; --code-ink:#e8f2ec; --code-font-size:13.5px;
         --good:#177245; --good-bg:#e2f1e8; --bad:#b3362b; --bad-bg:#fbe9e6;
         --shadow:0 1px 3px rgba(20,40,28,.08);
       }
@@ -84,26 +84,28 @@
       code, .mono{ font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:.92em; background:var(--panel2); border-radius:5px; padding:1px 5px; }
       pre{
         background:var(--code-bg); color:var(--code-ink); border-radius:12px; padding:14px 16px;
-        overflow-x:auto; max-height:none; font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:16px; line-height:1.6; margin:8px 0;
+        overflow-x:auto; max-height:none; font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:var(--code-font-size); line-height:1.6; margin:8px 0;
       }
       pre code{ background:none; padding:0; color:inherit; font-size:inherit; }
       .look{ color:var(--muted); font-size:14.5px; margin:4px 0; }
       /* matching */
-      .matchgrid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+      .matchgrid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:stretch; }
+      .matchgrid > div{ display:grid; gap:8px; grid-auto-rows:1fr; align-content:stretch; height:100%; }
       .wchip{
-        min-height:48px; text-align:left; border-radius:10px; border:1px solid var(--line); background:var(--panel);
+        height:100%; min-height:48px; text-align:left; border-radius:10px; border:1px solid var(--line); background:var(--panel);
         color:var(--ink); padding:8px 12px; font-size:14.5px; cursor:pointer; line-height:1.45;
+        display:flex; align-items:center; overflow-wrap:anywhere;
       }
       .wchip.term{ font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-weight:600; }
-      .wchip.sel{ border-color:var(--good); background:var(--good-bg); }
+      .wchip.sel{ border-color:var(--good); background:var(--good-bg); box-shadow:0 0 0 2px var(--good-bg); color:var(--ink); }
       .wchip.hit{ border-color:var(--good); background:var(--good-bg); color:var(--muted); cursor:default; }
-      .wchip.miss{ border-color:var(--bad); background:var(--bad-bg); }
+      .wchip.miss{ border-color:var(--line); background:var(--panel2); opacity:.7; }
       .match-status{ font-size:14px; color:var(--muted); margin-top:8px; }
       /* playground */
       textarea.play{
         width:100%; max-width:100%; min-height:120px; border-radius:12px; border:1px solid var(--line);
         background:var(--code-bg); color:var(--code-ink); padding:12px 14px;
-        font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:16px; line-height:1.6; resize:none; overflow:hidden;
+        font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:var(--code-font-size); line-height:1.6; resize:none; overflow:hidden;
       }
       .btn.small{ min-height:38px; padding:7px 13px; font-size:14px; }
       .btn:disabled{ opacity:.45; cursor:default; }
@@ -862,8 +864,8 @@
       lessonHost.appendChild(sectTitle("热身 · 单词配对"));
       lessonHost.appendChild(el("p", "look", "左边、右边哪边先点都行：先点任意一个，再点和它对应的另一个，对上了就锁定。"));
       var mg = el("div", "matchgrid");
-      var leftCol = el("div"); leftCol.style.display = "grid"; leftCol.style.gap = "8px";
-      var rightCol = el("div"); rightCol.style.display = "grid"; rightCol.style.gap = "8px";
+      var leftCol = el("div"); leftCol.style.display = "grid"; leftCol.style.gap = "8px"; leftCol.style.gridAutoRows = "1fr"; leftCol.style.height = "100%";
+      var rightCol = el("div"); rightCol.style.display = "grid"; rightCol.style.gap = "8px"; rightCol.style.gridAutoRows = "1fr"; rightCol.style.height = "100%";
       var order = d.words.map(function(_, i){ return i; });
       for (var i = order.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var tmp = order[i]; order[i] = order[j]; order[j] = tmp; }
       if (!matchState[d.n]) matchState[d.n] = {};
@@ -939,7 +941,7 @@
       function autoGrow(){
         ta.style.height = "auto";
         var h = ta.scrollHeight;
-        if (!h) h = ta.value.split("\n").length * 26 + 28;
+        if (!h) h = ta.value.split("\n").length * 22 + 28;
         ta.style.height = h + "px";
       }
       if (!playHistory[d.n]) playHistory[d.n] = { undo: [], redo: [], last: ta.value };
