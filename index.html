@@ -109,7 +109,8 @@
       }
       .btn.small{ min-height:38px; padding:7px 13px; font-size:14px; }
       .btn:disabled{ opacity:.45; cursor:default; }
-      .play-actions{ display:flex; gap:8px; margin:8px 0; flex-wrap:wrap; }
+      .play-actions{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px auto; max-width:420px; }
+      .play-actions .btn{ width:100%; text-align:center; }
       .btn{
         min-height:40px; padding:8px 18px; border-radius:10px; border:1px solid var(--accent);
         background:var(--accent); color:var(--accent-ink); font-size:15px; font-weight:600; cursor:pointer;
@@ -278,7 +279,7 @@
         <div class="howto">
           <div class="step"><b>1 · 热身配对</b><span>先把今天的 5–6 个英文词和它的作用配上对，混个脸熟。</span></div>
           <div class="step"><b>2 · 看一个完整例子</b><span>每课只讲一个工作场景，例子从头到尾是同一件事，看代码时先看标注的那几行。</span></div>
-          <div class="step"><b>3 · 自己改一次</b><span>动手区代码随便改，点「运行」立刻看效果；再答 3 道小测验，打勾收工。</span></div>
+          <div class="step"><b>3 · 自己改一次</b><span>动手区代码随便改，点「看看效果」立刻看效果；再答 3 道小测验，打勾收工。</span></div>
         </div>
       </section>
 
@@ -955,10 +956,10 @@
       function savePlay(){ playEdits[d.n] = ta.value; saveProgress(); }
       function setLast(v){ lastVal = v; hist.last = v; }
       var acts = el("div", "play-actions");
-      var runBtn = el("button", "btn", "运行看效果");
-      var undoBtn = el("button", "btn ghost small", "↩ 回到上一步");
-      var redoBtn = el("button", "btn ghost small", "↪ 重做一步");
-      var resetBtn = el("button", "btn ghost small", "还原初始");
+      var runBtn = el("button", "btn", "看看效果");
+      var resetBtn = el("button", "btn ghost", "还原初始");
+      var undoBtn = el("button", "btn ghost", "撤销一步");
+      var redoBtn = el("button", "btn ghost", "重做一步");
       var histNote = el("div", "match-status", "");
       histNote.style.margin = "0 0 6px";
       var frame = document.createElement("iframe");
@@ -1014,15 +1015,15 @@
         commitPending();
         if (ta.value === d.play) return;
         /* 还原前把当前完整代码（所有改动）作为一整条历史存好：
-           之后点一次「回到上一步」，就整体回到还原前改好的版本。 */
+           之后点一次「撤销一步」，就整体回到还原前改好的版本。 */
         undoStack.push(ta.value);
         redoStack.length = 0;
         ta.value = d.play;
         setLast(ta.value);
         savePlay(); autoGrow(); run(); refreshHistBtns();
-        histNote.textContent = "已还原到最初的代码。点「回到上一步」，能整体回到你刚才改好的版本，改过的内容都在。";
+        histNote.textContent = "已还原到最初的代码。点「撤销一步」，能整体回到你刚才改好的版本，改过的内容都在。";
       });
-      acts.appendChild(runBtn); acts.appendChild(undoBtn); acts.appendChild(redoBtn); acts.appendChild(resetBtn);
+      acts.appendChild(runBtn); acts.appendChild(resetBtn); acts.appendChild(undoBtn); acts.appendChild(redoBtn);
       lessonHost.appendChild(acts);
       lessonHost.appendChild(histNote);
       lessonHost.appendChild(frame);
