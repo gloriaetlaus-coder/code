@@ -956,10 +956,10 @@
       function savePlay(){ playEdits[d.n] = ta.value; saveProgress(); }
       function setLast(v){ lastVal = v; hist.last = v; }
       var acts = el("div", "play-actions");
-      var runBtn = el("button", "btn", "看看效果");
-      var resetBtn = el("button", "btn ghost", "还原初始");
-      var undoBtn = el("button", "btn ghost", "撤销一步");
-      var redoBtn = el("button", "btn ghost", "重做一步");
+      var runBtn = el("button", "btn", "▶️ 看看效果");
+      var resetBtn = el("button", "btn ghost", "🔄 还原初始");
+      var undoBtn = el("button", "btn ghost", "↩️ 撤销一步");
+      var redoBtn = el("button", "btn ghost", "↪️ 重做一步");
       var histNote = el("div", "match-status", "");
       histNote.style.margin = "0 0 6px";
       var frame = document.createElement("iframe");
