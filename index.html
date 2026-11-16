@@ -989,9 +989,12 @@
       frame.className = "preview"; frame.setAttribute("sandbox", "allow-scripts"); frame.title = "运行结果预览";
       function run(){ try { frame.srcdoc = ta.value; } catch (e) { /* 预览失败不影响课程内容显示 */ } }
       function refreshHistBtns(){
-        undoBtn.disabled = undoStack.length === 0;
-        redoBtn.disabled = redoStack.length === 0;
-        resetBtn.disabled = ta.value === d.play;
+        /* 四个按钮始终亮着、始终能点：不按有没有撤销/重做记录置灰禁用。
+           没有可走的步骤时，点一下只在下方给一行提示，按钮本身不禁用。 */
+        runBtn.disabled = false;
+        resetBtn.disabled = false;
+        undoBtn.disabled = false;
+        redoBtn.disabled = false;
       }
       function commitPending(){
         if (commitTimer){ clearTimeout(commitTimer); commitTimer = null; }
@@ -1018,7 +1021,7 @@
       runBtn.addEventListener("click", function(){ commitPending(); savePlay(); run(); refreshHistBtns(); });
       undoBtn.addEventListener("click", function(){
         commitPending();
-        if (!undoStack.length) return;
+        if (!undoStack.length){ histNote.textContent = "还没有可以撤销的步骤。"; return; }
         redoStack.push(ta.value);
         ta.value = undoStack.pop();
         setLast(ta.value);
@@ -1027,7 +1030,7 @@
       });
       redoBtn.addEventListener("click", function(){
         commitPending();
-        if (!redoStack.length) return;
+        if (!redoStack.length){ histNote.textContent = "还没有可以重做的步骤。"; return; }
         undoStack.push(ta.value);
         ta.value = redoStack.pop();
         setLast(ta.value);
@@ -1036,7 +1039,7 @@
       });
       resetBtn.addEventListener("click", function(){
         commitPending();
-        if (ta.value === d.play) return;
+        if (ta.value === d.play){ histNote.textContent = "已经是最初的代码了。"; return; }
         /* 还原前把当前完整代码（所有改动）作为一整条历史存好：
            之后点一次「撤销一步」，就整体回到还原前改好的版本。 */
         undoStack.push(ta.value);
