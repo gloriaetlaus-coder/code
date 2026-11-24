@@ -27,7 +27,8 @@
         }
       }
       * { box-sizing: border-box; }
-      html { -webkit-text-size-adjust: 100%; }
+      html { -webkit-text-size-adjust: 100%; overflow-anchor: none; }
+      body { overflow-anchor: none; }
       body{
         margin:0; background:var(--bg); color:var(--ink);
         font-family:"Avenir Next","PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;
@@ -1109,12 +1110,23 @@
       nav.appendChild(prev); nav.appendChild(next);
       lessonHost.appendChild(nav);
     }
+    /* 切课跳顶：先归零再渲染。浏览器滚动锚定会在新课内容长出来后把位置又拉回
+       底部，所以在画面出来之前就把所有滚动位置归零（配合 CSS 里 overflow-anchor:none
+       关掉锚定）；渲染完再归零一次，下一帧再确认一次，挡住预览 iframe 加载后的回跳。 */
+    function scrollTopNow(){
+      window.scrollTo(0, 0);
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    }
     function openDay(n, keepTop){
+      scrollTopNow();
       currentDay = n;
       renderLesson(dayObj(n));
       renderGrid();
       if (keepTop) { showHome(); }
-      else { showLesson(); window.scrollTo(0, 0); }
+      else { showLesson(); }
+      scrollTopNow();
+      requestAnimationFrame(function(){ scrollTopNow(); });
     }
     try { renderGrid(); } catch (e) { /* 保留静态课程目录 */ }
     try { openDay(1, true); } catch (e) { /* 保留静态第 1 课 */ }
